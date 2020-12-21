@@ -19,6 +19,7 @@ import { Loader } from "../Components";
 import { BASE_URL, convertDateForShow } from "../Utils";
 
 const ProjectLists = () => {
+  var Pathname = window.location.pathname.split("/").join("");
   const classes = useStyles();
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
@@ -35,8 +36,13 @@ const ProjectLists = () => {
   });
 
   useEffect(() => {
-    if (!allProjects.length) {
-      getProjectsDetails();
+    console.log("Pathname", Pathname);
+    if (Pathname) {
+      getProjectsDetails(Pathname);
+    }else{
+      if (!allProjects.length) {
+        getProjectsDetails();
+      }
     }
     return () => {
       setAlertMessage({
@@ -53,7 +59,18 @@ const ProjectLists = () => {
     };
   }, []);
 
-  const getProjectsDetails = () => {
+  useEffect(() => {
+    if (alertMessage.show) {
+      setTimeout(() => {
+        setAlertMessage({
+          show: false,
+          message: "",
+        });
+      }, 6000);
+    }
+  }, [alertMessage]);
+
+  const getProjectsDetails = (projectName) => {
     setLoading(true);
     var myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer keyRqp7PeC27ihGVY");
@@ -64,10 +81,14 @@ const ProjectLists = () => {
       redirect: "follow",
     };
 
-    fetch(
-      `${BASE_URL}/v0/appmgJl9lE5hXmoRD/Projects?maxRecords=3&view=Grid%20view`,
-      requestOptions
-    )
+    var URL = "";
+    if (projectName) {
+      URL = `Projects?filterByFormula=Name%3D'${projectName}'`;
+    } else {
+      URL = "Projects?maxRecords=3&view=Grid%20view";
+    }
+
+    fetch(`${BASE_URL}/v0/appmgJl9lE5hXmoRD/${URL}`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setLoading(false);
@@ -90,7 +111,7 @@ const ProjectLists = () => {
       });
   };
 
-  const getProjectContractsDetails = () => {
+  const getProjectContractsDetails = (id) => {
     setLoading(true);
     var myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer keyRqp7PeC27ihGVY");
@@ -102,7 +123,7 @@ const ProjectLists = () => {
     };
 
     fetch(
-      `${BASE_URL}/v0/appmgJl9lE5hXmoRD/Contracts?maxRecords=3&view=Grid%20view`,
+      `${BASE_URL}/v0/appmgJl9lE5hXmoRD/Contracts?maxRecords=3&view=Grid%20view&filterByFormula=%7BProject%20Record%20ID%7D%3D"${id}"`,
       requestOptions
     )
       .then((response) => response.json())
@@ -128,13 +149,14 @@ const ProjectLists = () => {
   };
 
   // Item selected
-  const handleListItemSelected = (event, index, name) => {
+  const handleListItemSelected = (event, index, name, id) => {
     setAllContracts([]);
     setSelectedProject({
       index,
       name,
     });
-    getProjectContractsDetails();
+    // var contractsName = name.split("Project of ").join("");
+    getProjectContractsDetails(id);
   };
 
   return (
@@ -159,7 +181,12 @@ const ProjectLists = () => {
                       button
                       selected={selectedProject.index === i}
                       onClick={(event) =>
-                        handleListItemSelected(event, i, project.fields.Name)
+                        handleListItemSelected(
+                          event,
+                          i,
+                          project.fields.Name,
+                          project.id
+                        )
                       }
                     >
                       <ListItemAvatar>
@@ -172,7 +199,18 @@ const ProjectLists = () => {
                         secondary={convertDateForShow(project.createdTime)}
                       />
                       <ListItemSecondaryAction>
-                        <IconButton edge='end' aria-label='comments'>
+                        <IconButton
+                          edge='end'
+                          aria-label='comments'
+                          onClick={(event) =>
+                            handleListItemSelected(
+                              event,
+                              i,
+                              project.fields.Name,
+                              project.id
+                            )
+                          }
+                        >
                           <ChevronRightIcon />
                         </IconButton>
                       </ListItemSecondaryAction>
