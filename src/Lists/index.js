@@ -4,14 +4,17 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar,
+  ListItemSecondaryAction,
+  IconButton,
   Avatar,
   Box,
   Typography,
   Divider,
-  useMediaQuery
+  useMediaQuery,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import WorkIcon from "@material-ui/icons/Work";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { Loader } from "../Components";
 import { BASE_URL, convertDateForShow } from "../Utils";
 
@@ -138,7 +141,11 @@ const ProjectLists = () => {
     <>
       {loading ? <Loader /> : null}
       <Box className={classes.mainWrapper} component='div' p={5}>
-        <Box component='div' display='flex' flexDirection={isSmall ? 'column' : 'row'}>
+        <Box
+          component='div'
+          display='flex'
+          flexDirection={isSmall ? "column" : "row"}
+        >
           {/* =============All Projects Listing ============= */}
           <Box component='div' display='flex' flexDirection='column'>
             <Typography variant='h6' gutterBottom className={classes.heading}>
@@ -164,6 +171,11 @@ const ProjectLists = () => {
                         primary={project.fields.Name}
                         secondary={convertDateForShow(project.createdTime)}
                       />
+                      <ListItemSecondaryAction>
+                        <IconButton edge='end' aria-label='comments'>
+                          <ChevronRightIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
                     </ListItem>
                     <Divider />
                   </React.Fragment>
@@ -173,7 +185,12 @@ const ProjectLists = () => {
           </Box>
 
           {/* =============Project contracts Listing============= */}
-          <Box component='div' display='flex' flexDirection='column' ml={isSmall ? 0 : 3}>
+          <Box
+            component='div'
+            display='flex'
+            flexDirection='column'
+            ml={isSmall ? 0 : 3}
+          >
             {allContracts.length > 0 ? (
               <>
                 <Typography
@@ -223,7 +240,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#d3d3d3",
   },
   heading: {
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       marginTop: 10,
     },
   },
@@ -231,7 +248,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     maxWidth: 400,
     backgroundColor: theme.palette.background.paper,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       maxWidth: "100%",
     },
   },
